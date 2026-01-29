@@ -219,6 +219,50 @@ bool Matrix::isCompatibleForMultiplication(const Matrix& other) const {
     return cols == other.rows;
 }
 
+// Row operations (for Gaussian elimination)
+void Matrix::swapRows(size_t i, size_t j) {
+    if (i >= rows || j >= rows) {
+        throw std::out_of_range("Row index out of range");
+    }
+    if (i != j) {
+        std::swap(data[i], data[j]);
+    }
+}
+
+void Matrix::scaleRow(size_t row, double scalar) {
+    if (row >= rows) {
+        throw std::out_of_range("Row index out of range");
+    }
+    for (size_t c = 0; c < cols; c++) {
+        data[row][c] *= scalar;
+    }
+}
+
+void Matrix::addRowMultiple(size_t targetRow, size_t sourceRow, double multiple) {
+    if (targetRow >= rows || sourceRow >= rows) {
+        throw std::out_of_range("Row index out of range");
+    }
+    for (size_t c = 0; c < cols; c++) {
+        data[targetRow][c] += multiple * data[sourceRow][c];
+    }
+}
+
+void Matrix::printAugmented() const {
+    if (cols < 2) {
+        print();
+        return;
+    }
+    for (size_t i = 0; i < rows; i++) {
+        std::cout << "| ";
+        for (size_t j = 0; j < cols; j++) {
+            if (j == cols - 1) std::cout << " | ";
+            std::cout << std::setw(10) << std::fixed << std::setprecision(4) << data[i][j];
+            if (j < cols - 1) std::cout << " ";
+        }
+        std::cout << " |" << std::endl;
+    }
+}
+
 // Static factory methods
 Matrix Matrix::identity(size_t size) {
     Matrix result(size, size);

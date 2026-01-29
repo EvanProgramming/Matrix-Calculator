@@ -45,6 +45,14 @@ public:
     bool isCompatibleForAddition(const Matrix& other) const;
     bool isCompatibleForMultiplication(const Matrix& other) const;
     
+    // Row operations (for Gaussian elimination)
+    void swapRows(size_t i, size_t j);
+    void scaleRow(size_t row, double scalar);
+    void addRowMultiple(size_t targetRow, size_t sourceRow, double multiple);
+    
+    // Print augmented matrix [A|b] with vertical bar before last column
+    void printAugmented() const;
+    
     // Static factory methods
     static Matrix identity(size_t size);
 };
