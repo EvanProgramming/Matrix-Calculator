@@ -17,6 +17,7 @@ add_executable(MatrixApp
   src/main.cpp
   src/MainWindow.cpp
   src/matrix.cpp
+  src/fraction.cpp
 )
 
 target_include_directories(MatrixApp PRIVATE

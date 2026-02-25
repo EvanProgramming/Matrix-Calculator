@@ -7,7 +7,7 @@
 #include <QMainWindow>
 #include <QTableWidget>
 
-class QDoubleSpinBox;
+class QLineEdit;
 class QSpinBox;
 class QGroupBox;
 class QLabel;
@@ -62,7 +62,7 @@ private:
   QSpinBox* colsB_;
   QTableWidget* tableB_;
   QTableWidget* resultTable_;
-  QDoubleSpinBox* scalarSpin_;
+  QLineEdit* scalarEdit_;
   QStatusBar* statusBar_;
   QWidget* centralWidget_;
 };

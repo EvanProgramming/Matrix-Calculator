@@ -6,6 +6,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/MatrixApp.dir/MatrixApp_autogen/mocs_compilation.cpp.o.d"
   "CMakeFiles/MatrixApp.dir/src/MainWindow.cpp.o"
   "CMakeFiles/MatrixApp.dir/src/MainWindow.cpp.o.d"
+  "CMakeFiles/MatrixApp.dir/src/fraction.cpp.o"
+  "CMakeFiles/MatrixApp.dir/src/fraction.cpp.o.d"
   "CMakeFiles/MatrixApp.dir/src/main.cpp.o"
   "CMakeFiles/MatrixApp.dir/src/main.cpp.o.d"
   "CMakeFiles/MatrixApp.dir/src/matrix.cpp.o"

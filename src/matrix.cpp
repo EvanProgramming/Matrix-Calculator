@@ -2,17 +2,12 @@
 
 #include "matrix.hpp"
 #include <algorithm>
-#include <cmath>
 #include <sstream>
 
-namespace {
-  constexpr double kEpsilon = 1e-10;
-}
-
 Matrix::Matrix(std::size_t rows, std::size_t cols)
-  : rows_(rows), cols_(cols), data_(rows * cols, 0.0) {}
+  : rows_(rows), cols_(cols), data_(rows * cols, Fraction(0, 1)) {}
 
-Matrix::Matrix(const std::vector<std::vector<double>>& data) {
+Matrix::Matrix(const std::vector<std::vector<Fraction>>& data) {
   if (data.empty()) {
     rows_ = 0;
     cols_ = 0;
@@ -23,14 +18,14 @@ Matrix::Matrix(const std::vector<std::vector<double>>& data) {
   cols_ = data[0].size();
   for (const auto& row : data) {
     if (row.size() != cols_)
-      throw std::invalid_argument("Matrix: inconsistent row lengths in vector<vector<double>>");
+      throw std::invalid_argument("Matrix: inconsistent row lengths in vector<vector<Fraction>>");
   }
   data_.reserve(rows_ * cols_);
   for (const auto& row : data)
     data_.insert(data_.end(), row.begin(), row.end());
 }
 
-Matrix::Matrix(std::initializer_list<std::initializer_list<double>> init) {
+Matrix::Matrix(std::initializer_list<std::initializer_list<Fraction>> init) {
   if (init.size() == 0) {
     rows_ = 0;
     cols_ = 0;
@@ -61,12 +56,12 @@ void Matrix::boundsCheck(std::size_t row, std::size_t col) const {
 #endif
 }
 
-double& Matrix::operator()(std::size_t row, std::size_t col) {
+Fraction& Matrix::operator()(std::size_t row, std::size_t col) {
   boundsCheck(row, col);
   return data_[index(row, col)];
 }
 
-double Matrix::operator()(std::size_t row, std::size_t col) const {
+const Fraction& Matrix::operator()(std::size_t row, std::size_t col) const {
   boundsCheck(row, col);
   return data_[index(row, col)];
 }
@@ -107,60 +102,58 @@ Matrix Matrix::operator*(const Matrix& other) const {
   Matrix result(rows_, other.cols_);
   for (std::size_t i = 0; i < rows_; ++i)
     for (std::size_t k = 0; k < cols_; ++k) {
-      double a_ik = data_[index(i, k)];
+      const Fraction& a_ik = data_[index(i, k)];
       for (std::size_t j = 0; j < other.cols_; ++j)
-        result.data_[result.index(i, j)] += a_ik * other.data_[other.index(k, j)];
+        result.data_[result.index(i, j)] = result.data_[result.index(i, j)] + a_ik * other.data_[other.index(k, j)];
     }
   return result;
 }
 
-Matrix Matrix::operator*(double scalar) const {
+Matrix Matrix::operator*(const Fraction& scalar) const {
   Matrix result(rows_, cols_);
   for (std::size_t i = 0; i < data_.size(); ++i)
     result.data_[i] = data_[i] * scalar;
   return result;
 }
 
-Matrix Matrix::operator/(double scalar) const {
-  if (std::abs(scalar) < kEpsilon) {
-    throw std::invalid_argument("Matrix division by scalar: scalar is zero (or too small).");
+Matrix Matrix::operator/(const Fraction& scalar) const {
+  if (scalar.isZero()) {
+    throw std::invalid_argument("Matrix division by scalar: scalar is zero.");
   }
-  return *this * (1.0 / scalar);
+  return *this * Fraction(scalar.denominator(), scalar.numerator());
 }
 
-// --- Gauss–Jordan: RREF with partial pivoting ---
+// --- Gauss–Jordan: RREF with partial pivoting (exact Fraction arithmetic) ---
 Matrix Matrix::rref() const {
   Matrix M = *this;
   std::size_t lead = 0;
   for (std::size_t r = 0; r < M.rows_ && lead < M.cols_; ++r) {
-    // Partial pivot: find row with largest |M(row, lead)|
     std::size_t pivotRow = r;
-    double pivotVal = std::abs(M(r, lead));
+    Fraction pivotVal = M(r, lead).abs();
     for (std::size_t i = r + 1; i < M.rows_; ++i) {
-      double v = std::abs(M(i, lead));
+      Fraction v = M(i, lead).abs();
       if (v > pivotVal) {
         pivotVal = v;
         pivotRow = i;
       }
     }
-    if (pivotVal < kEpsilon) {
+    if (M(pivotRow, lead).isZero()) {
       ++lead;
       --r;
       continue;
     }
-    // Swap rows r and pivotRow
     if (pivotRow != r) {
       for (std::size_t c = 0; c < M.cols_; ++c)
         std::swap(M(r, c), M(pivotRow, c));
     }
-    double pivot = M(r, lead);
+    Fraction pivot = M(r, lead);
     for (std::size_t c = 0; c < M.cols_; ++c)
-      M(r, c) /= pivot;
+      M(r, c) = M(r, c) / pivot;
     for (std::size_t i = 0; i < M.rows_; ++i) {
       if (i == r) continue;
-      double factor = M(i, lead);
+      Fraction factor = M(i, lead);
       for (std::size_t c = 0; c < M.cols_; ++c)
-        M(i, c) -= factor * M(r, c);
+        M(i, c) = M(i, c) - factor * M(r, c);
     }
     ++lead;
   }
@@ -178,20 +171,20 @@ Matrix Matrix::inverse() const {
   for (std::size_t i = 0; i < n; ++i) {
     for (std::size_t j = 0; j < n; ++j)
       aug(i, j) = (*this)(i, j);
-    aug(i, n + i) = 1.0;
+    aug(i, n + i) = Fraction(1, 1);
   }
   std::size_t lead = 0;
   for (std::size_t r = 0; r < n && lead < n; ++r) {
     std::size_t pivotRow = r;
-    double pivotVal = std::abs(aug(r, lead));
+    Fraction pivotVal = aug(r, lead).abs();
     for (std::size_t i = r + 1; i < n; ++i) {
-      double v = std::abs(aug(i, lead));
+      Fraction v = aug(i, lead).abs();
       if (v > pivotVal) {
         pivotVal = v;
         pivotRow = i;
       }
     }
-    if (pivotVal < kEpsilon) {
+    if (aug(pivotRow, lead).isZero()) {
       std::ostringstream oss;
       oss << "Matrix inverse: matrix is singular (no pivot in column " << lead + 1 << ").";
       throw std::runtime_error(oss.str());
@@ -200,14 +193,14 @@ Matrix Matrix::inverse() const {
       for (std::size_t c = 0; c < 2 * n; ++c)
         std::swap(aug(r, c), aug(pivotRow, c));
     }
-    double pivot = aug(r, lead);
+    Fraction pivot = aug(r, lead);
     for (std::size_t c = 0; c < 2 * n; ++c)
-      aug(r, c) /= pivot;
+      aug(r, c) = aug(r, c) / pivot;
     for (std::size_t i = 0; i < n; ++i) {
       if (i == r) continue;
-      double factor = aug(i, lead);
+      Fraction factor = aug(i, lead);
       for (std::size_t c = 0; c < 2 * n; ++c)
-        aug(i, c) -= factor * aug(r, c);
+        aug(i, c) = aug(i, c) - factor * aug(r, c);
     }
     ++lead;
   }
@@ -218,11 +211,11 @@ Matrix Matrix::inverse() const {
   return inv;
 }
 
-bool Matrix::approxEqual(const Matrix& a, const Matrix& b, double tolerance) {
+bool Matrix::approxEqual(const Matrix& a, const Matrix& b) {
   if (a.rows_ != b.rows_ || a.cols_ != b.cols_)
     return false;
   for (std::size_t i = 0; i < a.data_.size(); ++i)
-    if (std::abs(a.data_[i] - b.data_[i]) > tolerance)
+    if (a.data_[i] != b.data_[i])
       return false;
   return true;
 }

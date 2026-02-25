@@ -1,9 +1,10 @@
 // MainWindow.cpp — Main window implementation: matrix grids, operations, result display, error handling.
 
 #include "MainWindow.hpp"
+#include "fraction.hpp"
 #include <QApplication>
 #include <QDebug>
-#include <QDoubleSpinBox>
+#include <QLineEdit>
 #include <QFormLayout>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -23,7 +24,6 @@ namespace {
   const int kMaxRowsCols = 20;
   const int kDefaultRows = 2;
   const int kDefaultCols = 2;
-  const double kDefaultScalar = 1.0;
 }
 
 MainWindow::MainWindow(QWidget* parent)
@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget* parent)
   , colsB_(nullptr)
   , tableB_(nullptr)
   , resultTable_(nullptr)
-  , scalarSpin_(nullptr)
+  , scalarEdit_(nullptr)
   , statusBar_(nullptr)
   , centralWidget_(nullptr)
 {
@@ -139,12 +139,11 @@ void MainWindow::onRowsColsChanged() {
 void MainWindow::buildOperationPanel() {
   QGroupBox* opsGroup = new QGroupBox(tr("Operations"));
   QVBoxLayout* v = new QVBoxLayout(opsGroup);
-  scalarSpin_ = new QDoubleSpinBox();
-  scalarSpin_->setRange(-1e10, 1e10);
-  scalarSpin_->setDecimals(4);
-  scalarSpin_->setValue(kDefaultScalar);
+  scalarEdit_ = new QLineEdit();
+  scalarEdit_->setPlaceholderText(tr("e.g. 2, 1/2, -3/4"));
+  scalarEdit_->setText(QStringLiteral("1"));
   QFormLayout* scalarForm = new QFormLayout();
-  scalarForm->addRow(tr("Scalar:"), scalarSpin_);
+  scalarForm->addRow(tr("Scalar (fraction or number):"), scalarEdit_);
   v->addLayout(scalarForm);
 
   QGridLayout* grid = new QGridLayout();
@@ -190,12 +189,9 @@ Matrix MainWindow::loadMatrixFromTable(QTableWidget* table) const {
   for (int i = 0; i < r; ++i)
     for (int j = 0; j < c; ++j) {
       QTableWidgetItem* item = table->item(i, j);
-      double val = 0.0;
-      if (item && !item->text().isEmpty()) {
-        bool ok = false;
-        val = item->text().trimmed().toDouble(&ok);
-        if (!ok) val = 0.0;
-      }
+      Fraction val(0, 1);
+      if (item && !item->text().trimmed().isEmpty())
+        val = Fraction::fromString(item->text().trimmed().toStdString());
       M(static_cast<std::size_t>(i), static_cast<std::size_t>(j)) = val;
     }
   return M;
@@ -206,7 +202,7 @@ void MainWindow::displayMatrixInTable(const Matrix& M, QTableWidget* table) {
   table->setColumnCount(static_cast<int>(M.cols()));
   for (std::size_t i = 0; i < M.rows(); ++i)
     for (std::size_t j = 0; j < M.cols(); ++j) {
-      QTableWidgetItem* item = new QTableWidgetItem(QString::number(M(i, j), 'g', 6));
+      QTableWidgetItem* item = new QTableWidgetItem(QString::fromStdString(M(i, j).toString()));
       table->setItem(static_cast<int>(i), static_cast<int>(j), item);
     }
 }
@@ -278,7 +274,7 @@ void MainWindow::performMultiplyBA() {
 void MainWindow::performScalarMultiplyA() {
   try {
     Matrix A = loadMatrixFromTable(tableA_);
-    double s = scalarSpin_->value();
+    Fraction s = Fraction::fromString(scalarEdit_->text().trimmed().toStdString());
     setResult(A * s);
   } catch (const std::exception& e) {
     showError(QString::fromUtf8(e.what()));
@@ -288,7 +284,7 @@ void MainWindow::performScalarMultiplyA() {
 void MainWindow::performScalarMultiplyB() {
   try {
     Matrix B = loadMatrixFromTable(tableB_);
-    double s = scalarSpin_->value();
+    Fraction s = Fraction::fromString(scalarEdit_->text().trimmed().toStdString());
     setResult(B * s);
   } catch (const std::exception& e) {
     showError(QString::fromUtf8(e.what()));
@@ -298,7 +294,7 @@ void MainWindow::performScalarMultiplyB() {
 void MainWindow::performScalarDivideA() {
   try {
     Matrix A = loadMatrixFromTable(tableA_);
-    double s = scalarSpin_->value();
+    Fraction s = Fraction::fromString(scalarEdit_->text().trimmed().toStdString());
     setResult(A / s);
   } catch (const std::exception& e) {
     showError(QString::fromUtf8(e.what()));
@@ -308,7 +304,7 @@ void MainWindow::performScalarDivideA() {
 void MainWindow::performScalarDivideB() {
   try {
     Matrix B = loadMatrixFromTable(tableB_);
-    double s = scalarSpin_->value();
+    Fraction s = Fraction::fromString(scalarEdit_->text().trimmed().toStdString());
     setResult(B / s);
   } catch (const std::exception& e) {
     showError(QString::fromUtf8(e.what()));
@@ -360,31 +356,31 @@ void MainWindow::runInternalTests() {
   };
   try {
     Matrix A(2, 2);
-    A(0, 0) = 1; A(0, 1) = 2;
-    A(1, 0) = 3; A(1, 1) = 4;
+    A(0, 0) = Fraction(1, 1); A(0, 1) = Fraction(2, 1);
+    A(1, 0) = Fraction(3, 1); A(1, 1) = Fraction(4, 1);
     Matrix B(2, 2);
-    B(0, 0) = 5; B(0, 1) = 6;
-    B(1, 0) = 7; B(1, 1) = 8;
+    B(0, 0) = Fraction(5, 1); B(0, 1) = Fraction(6, 1);
+    B(1, 0) = Fraction(7, 1); B(1, 1) = Fraction(8, 1);
     Matrix sum = A + B;
     Matrix diff = sum - B;
     run("(A+B)-B ≈ A", Matrix::approxEqual(diff, A));
 
     Matrix I(2, 2);
-    I(0, 0) = 1; I(0, 1) = 0;
-    I(1, 0) = 0; I(1, 1) = 1;
+    I(0, 0) = Fraction(1, 1); I(0, 1) = Fraction(0, 1);
+    I(1, 0) = Fraction(0, 1); I(1, 1) = Fraction(1, 1);
     Matrix AI = A * I;
     run("A*I ≈ A", Matrix::approxEqual(AI, A));
 
     Matrix C(3, 3);
-    C(0, 0) = 1; C(0, 1) = 0; C(0, 2) = 1;
-    C(1, 0) = 0; C(1, 1) = 2; C(1, 2) = 0;
-    C(2, 0) = 1; C(2, 1) = 0; C(2, 2) = 2;
+    C(0, 0) = Fraction(1, 1); C(0, 1) = Fraction(0, 1); C(0, 2) = Fraction(1, 1);
+    C(1, 0) = Fraction(0, 1); C(1, 1) = Fraction(2, 1); C(1, 2) = Fraction(0, 1);
+    C(2, 0) = Fraction(1, 1); C(2, 1) = Fraction(0, 1); C(2, 2) = Fraction(2, 1);
     Matrix invC = C.inverse();
     Matrix CinvC = C * invC;
     Matrix I3(3, 3);
-    I3(0, 0) = 1; I3(0, 1) = 0; I3(0, 2) = 0;
-    I3(1, 0) = 0; I3(1, 1) = 1; I3(1, 2) = 0;
-    I3(2, 0) = 0; I3(2, 1) = 0; I3(2, 2) = 1;
+    I3(0, 0) = Fraction(1, 1); I3(0, 1) = Fraction(0, 1); I3(0, 2) = Fraction(0, 1);
+    I3(1, 0) = Fraction(0, 1); I3(1, 1) = Fraction(1, 1); I3(1, 2) = Fraction(0, 1);
+    I3(2, 0) = Fraction(0, 1); I3(2, 1) = Fraction(0, 1); I3(2, 2) = Fraction(1, 1);
     run("A*A.inverse() ≈ I (3x3)", Matrix::approxEqual(CinvC, I3));
   } catch (const std::exception& e) {
     qDebug("Matrix internal test exception: %s", e.what());

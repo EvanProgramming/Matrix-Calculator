@@ -84,16 +84,16 @@ clean: CMakeFiles/MatrixApp_autogen.dir/clean
 # Target rules for target CMakeFiles/MatrixApp.dir
 
 # All Build rule for target.
-CMakeFiles/MatrixApp.dir/all: CMakeFiles/MatrixApp_autogen_timestamp_deps.dir/all
 CMakeFiles/MatrixApp.dir/all: CMakeFiles/MatrixApp_autogen.dir/all
+CMakeFiles/MatrixApp.dir/all: CMakeFiles/MatrixApp_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatrixApp.dir/build.make CMakeFiles/MatrixApp.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatrixApp.dir/build.make CMakeFiles/MatrixApp.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/evan/Documents/Programming/Cpp/Matrix-Calculator/build/CMakeFiles --progress-num=1,2,3,4,5,6 "Built target MatrixApp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/evan/Documents/Programming/Cpp/Matrix-Calculator/build/CMakeFiles --progress-num=1,2,3,4,5,6,7 "Built target MatrixApp"
 .PHONY : CMakeFiles/MatrixApp.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/MatrixApp.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/evan/Documents/Programming/Cpp/Matrix-Calculator/build/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/evan/Documents/Programming/Cpp/Matrix-Calculator/build/CMakeFiles 8
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/MatrixApp.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/evan/Documents/Programming/Cpp/Matrix-Calculator/build/CMakeFiles 0
 .PHONY : CMakeFiles/MatrixApp.dir/rule
@@ -105,7 +105,7 @@ MatrixApp: CMakeFiles/MatrixApp.dir/rule
 # codegen rule for target.
 CMakeFiles/MatrixApp.dir/codegen: CMakeFiles/MatrixApp_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatrixApp.dir/build.make CMakeFiles/MatrixApp.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/evan/Documents/Programming/Cpp/Matrix-Calculator/build/CMakeFiles --progress-num=1,2,3,4,5,6 "Finished codegen for target MatrixApp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/evan/Documents/Programming/Cpp/Matrix-Calculator/build/CMakeFiles --progress-num=1,2,3,4,5,6,7 "Finished codegen for target MatrixApp"
 .PHONY : CMakeFiles/MatrixApp.dir/codegen
 
 # clean rule for target.
@@ -152,7 +152,7 @@ CMakeFiles/MatrixApp_autogen_timestamp_deps.dir/clean:
 CMakeFiles/MatrixApp_autogen.dir/all: CMakeFiles/MatrixApp_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatrixApp_autogen.dir/build.make CMakeFiles/MatrixApp_autogen.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatrixApp_autogen.dir/build.make CMakeFiles/MatrixApp_autogen.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/evan/Documents/Programming/Cpp/Matrix-Calculator/build/CMakeFiles --progress-num=7 "Built target MatrixApp_autogen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/evan/Documents/Programming/Cpp/Matrix-Calculator/build/CMakeFiles --progress-num=8 "Built target MatrixApp_autogen"
 .PHONY : CMakeFiles/MatrixApp_autogen.dir/all
 
 # Build rule for subdir invocation for target.
@@ -169,7 +169,7 @@ MatrixApp_autogen: CMakeFiles/MatrixApp_autogen.dir/rule
 # codegen rule for target.
 CMakeFiles/MatrixApp_autogen.dir/codegen: CMakeFiles/MatrixApp_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatrixApp_autogen.dir/build.make CMakeFiles/MatrixApp_autogen.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/evan/Documents/Programming/Cpp/Matrix-Calculator/build/CMakeFiles --progress-num=7 "Finished codegen for target MatrixApp_autogen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/evan/Documents/Programming/Cpp/Matrix-Calculator/build/CMakeFiles --progress-num=8 "Finished codegen for target MatrixApp_autogen"
 .PHONY : CMakeFiles/MatrixApp_autogen.dir/codegen
 
 # clean rule for target.

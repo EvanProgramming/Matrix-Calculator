@@ -248,6 +248,30 @@ src/MainWindow.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatrixApp.dir/build.make CMakeFiles/MatrixApp.dir/src/MainWindow.cpp.s
 .PHONY : src/MainWindow.cpp.s
 
+src/fraction.o: src/fraction.cpp.o
+.PHONY : src/fraction.o
+
+# target to build an object file
+src/fraction.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatrixApp.dir/build.make CMakeFiles/MatrixApp.dir/src/fraction.cpp.o
+.PHONY : src/fraction.cpp.o
+
+src/fraction.i: src/fraction.cpp.i
+.PHONY : src/fraction.i
+
+# target to preprocess a source file
+src/fraction.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatrixApp.dir/build.make CMakeFiles/MatrixApp.dir/src/fraction.cpp.i
+.PHONY : src/fraction.cpp.i
+
+src/fraction.s: src/fraction.cpp.s
+.PHONY : src/fraction.s
+
+# target to generate assembly for a file
+src/fraction.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatrixApp.dir/build.make CMakeFiles/MatrixApp.dir/src/fraction.cpp.s
+.PHONY : src/fraction.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -317,6 +341,9 @@ help:
 	@echo "... src/MainWindow.o"
 	@echo "... src/MainWindow.i"
 	@echo "... src/MainWindow.s"
+	@echo "... src/fraction.o"
+	@echo "... src/fraction.i"
+	@echo "... src/fraction.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
